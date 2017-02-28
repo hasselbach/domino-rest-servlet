@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description name="Domino REST Servlet UpdateSite">
+      (c) 2017 Sven Hasselbach
+http://www.hasselba.ch
+   </description>
+   <feature url="features/dominorestservlet.feature_1.0.0.201702281305.jar" id="dominorestservlet.feature" version="1.0.0.201702281305">
+      <category name="Domino REST Servlet"/>
+   </feature>
+   <category-def name="Domino REST Servlet" label="Domino REST Servlet"/>
+</site>

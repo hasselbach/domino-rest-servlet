@@ -5,7 +5,7 @@
    <extension
          point="com.ibm.pvc.webcontainer.application">
       <contextRoot>
-         /dominorestservlet
+         /ec2017
       </contextRoot>
       <contentLocation>
          WebContent

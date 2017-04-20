@@ -9,7 +9,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jackson-jaxrs-base-2.5.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jackson-jaxrs-json-provider-2.5.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jackson-module-jaxb-annotations-2.5.0.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/spymemcached-2.12.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/spymemcached-2.12.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

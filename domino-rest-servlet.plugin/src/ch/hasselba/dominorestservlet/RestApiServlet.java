@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import com.ibm.domino.osgi.core.context.ContextInfo;
 
 import ch.hasselba.concurrent.NotesCallableUserTask;
+import ch.hasselba.domino.GC;
 import ch.hasselba.memcache.ValueHolder;
 import lotus.domino.Base;
 import lotus.domino.Database;
@@ -94,7 +95,7 @@ public class RestApiServlet {
 		} catch (NotesException e) {
 			e.printStackTrace();
 		} finally {
-			name = recycle(name);
+			name = GC.recycle(name);
 		}
 
 		throw new NotAuthenticatedException();
@@ -105,15 +106,15 @@ public class RestApiServlet {
 	@Produces(CONTENT_TYPE)
 	public Response getDemo() {
 
-		// String hlp = null;
-		// try {
-		// hlp = ContextInfo.getUserSession().getEffectiveUserName();
-		// } catch (NotesException e1) {
-		// e1.printStackTrace();
-		// }
+		 String hlp = null;
+		 try {
+			 hlp = ContextInfo.getUserSession().getEffectiveUserName();
+		 } catch (NotesException e1) {
+			 e1.printStackTrace();
+		 }
 
-		final String userName = "hlp";
-		//
+		final String userName = hlp;
+	
 		ValueHolder<String> vh = new ValueHolder<String>("DEMO~" + userName, 10) {
 
 			@Override
@@ -150,8 +151,8 @@ public class RestApiServlet {
 								} catch (Exception e) {
 									e.printStackTrace();
 								} finally {
-									view = recycle(view);
-									db = recycle(db);
+									view = GC.recycle(view);
+									db = GC.recycle(db);
 								}
 								return null;
 							}
@@ -177,20 +178,5 @@ public class RestApiServlet {
 
 	}
 
-	/**
-	 * recycle the domino object
-	 * 
-	 * @param obj
-	 *            the domino object to recyle
-	 * @return null
-	 */
-	private <T> T recycle(Base obj) {
-		try {
-			obj.recycle();
-		} catch (NotesException e) {
-			// ignore it.
-		}
-		return null;
-	}
 
 }

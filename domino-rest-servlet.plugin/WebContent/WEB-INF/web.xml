@@ -20,4 +20,10 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 	</servlet-mapping>
     
 
+	<listener>
+         <listener-class>
+             ch.hasselba.servlet.AppServletContextListener
+         </listener-class>
+    </listener>
+    
 </web-app>

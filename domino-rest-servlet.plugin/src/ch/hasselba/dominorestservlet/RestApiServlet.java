@@ -19,7 +19,6 @@ import com.ibm.domino.osgi.core.context.ContextInfo;
 import ch.hasselba.concurrent.NotesCallableUserTask;
 import ch.hasselba.domino.GC;
 import ch.hasselba.memcache.ValueHolder;
-import lotus.domino.Base;
 import lotus.domino.Database;
 import lotus.domino.Name;
 import lotus.domino.NotesException;
@@ -101,36 +100,51 @@ public class RestApiServlet {
 		throw new NotAuthenticatedException();
 	}
 
+	/**
+	 * The Demo Endpoint
+	 * returns the UNID of the first document in groups view
+	 * using MemCached & MultiThreaded response
+	 * 
+	 */
 	@GET
 	@Path("/demo")
 	@Produces(CONTENT_TYPE)
 	public Response getDemo() {
 
-		 String hlp = null;
-		 try {
-			 hlp = ContextInfo.getUserSession().getEffectiveUserName();
-		 } catch (NotesException e1) {
-			 e1.printStackTrace();
-		 }
+		// get the current user name
+		String hlp = null;
+		try {
+			hlp = ContextInfo.getUserSession().getEffectiveUserName();
+		} catch (NotesException ne) {
+			ne.printStackTrace();
+		}
 
+		// add the username into a "final" variable (otherwise it is not accessable in the Callable)
 		final String userName = hlp;
 	
+		// use MemCached for 10 seconds
 		ValueHolder<String> vh = new ValueHolder<String>("DEMO~" + userName, 10) {
 
+			// todo if value is not in cache
 			@Override
 			public String loadValue() {
-
+				// get the NotesThreadPool
 				ServiceLocator locator = (ServiceLocator) ServiceFactory.getInstance().getServiceLocator();
+				
+				// add a callable to 
 				Future<String> doc = locator.getNotesThreadPool()
 						.doSomeNotesWorkReturnFuture(new NotesCallableUserTask<String>(userName) {
+							
 							@Override
 							public String callNotes(Session session) throws Exception {
 
 								Database db = null;
 								View view = null;
 								try {
+									
+									// get the local mail database
 									db = session.getDatabase("", "names.nsf", false);
-
+									
 									if (db.isOpen() == false) {
 										boolean success = db.open();
 										if (!success) {
@@ -138,11 +152,13 @@ public class RestApiServlet {
 										}
 									}
 
+									// get the "groups" view
 									view = db.getView("($Groups)");
 									if (view == null) {
 										throw new Exception("View '($Groups)' not found.");
 									}
 
+									// return the UNID of the first document
 									return view.getFirstDocument().getUniversalID();
 
 								} catch (NotesException ne) {
@@ -157,6 +173,8 @@ public class RestApiServlet {
 								return null;
 							}
 						});
+				
+				// execute the callable and return the result
 				String result = null;
 				try {
 					result = doc.get();
@@ -169,8 +187,11 @@ public class RestApiServlet {
 			}
 
 		};
+		
+		// grab the result from the ValueHolder
 		String result = vh.getValue();
 
+		// Build the JSON response and send it back 
 		ResponseBuilder builder = Response.ok(result, MediaType.APPLICATION_JSON).header(HttpHeaders.CONTENT_TYPE,
 				CONTENT_TYPE);
 
